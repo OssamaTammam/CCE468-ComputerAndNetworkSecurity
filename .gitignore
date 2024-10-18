@@ -1,0 +1,33 @@
+# Go binary files
+**/*.exe
+**/*.exe~
+**/*.out
+**/*.test
+
+# Compiled object files
+**/*.o
+**/*.a
+
+# Vendor directory
+**/vendor/
+
+# Go workspace files
+**/*.go.sum
+**/*.go.mod
+
+# IDE and editor specific files
+**/.idea/
+**/*.vscode/
+**/*.sublime-project
+**/*.sublime-workspace
+
+# OS generated files
+**/.DS_Store
+**/Thumbs.db
+
+# Log files
+**/*.log
+
+# Temporary files
+**/*.tmp
+**/*.temp
