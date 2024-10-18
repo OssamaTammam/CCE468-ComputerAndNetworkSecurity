@@ -4,11 +4,22 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strconv"
 )
 
 type Position struct {
 	Sentence int
 	Letter   int
+}
+
+func hexToBinary(hexString string) (byte, error) {
+	// Parse the hexadecimal string as an unsigned integer (base 16)
+	value, err := strconv.ParseUint(hexString, 16, 8)
+	if err != nil {
+		return 0, fmt.Errorf("invalid hexadecimal string: %w", err)
+	}
+
+	return byte(value), nil
 }
 
 func locateSpaces(ciphertexts []string, plaintexts *[]string) []Position {
