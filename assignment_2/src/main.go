@@ -4,7 +4,13 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strings"
 )
+
+type Position struct {
+	Sentence int
+	Letter   int
+}
 
 func main() {
 	fileName := "ciphertexts.txt"
@@ -31,5 +37,14 @@ func main() {
 		return
 	}
 
-	
+	// Make empty plaintexts to hold possible information while decrypting the ciphertexts
+	plaintexts := make([]string, len(ciphertexts))
+	placeholder := strings.Repeat("$", len(ciphertexts[0])/2)
+	for i := range plaintexts {
+		plaintexts[i] = placeholder
+	}
+
+	// Locate possible space positions
+	possibleSpaces := []Position{}
+
 }
