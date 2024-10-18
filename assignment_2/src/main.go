@@ -4,12 +4,17 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"strings"
 )
 
 type Position struct {
 	Sentence int
 	Letter   int
+}
+
+func locateSpaces(ciphertexts []string, plaintexts *[]string) []Position {
+	possibleSpaces := []Position{}
+
+	return possibleSpaces
 }
 
 func main() {
@@ -38,13 +43,15 @@ func main() {
 	}
 
 	// Make empty plaintexts to hold possible information while decrypting the ciphertexts
-	plaintexts := make([]string, len(ciphertexts))
-	placeholder := strings.Repeat("$", len(ciphertexts[0])/2)
+	plaintexts := make([][]rune, len(ciphertexts))
 	for i := range plaintexts {
-		plaintexts[i] = placeholder
+		plaintexts[i] = make([]rune, len(ciphertexts[0])/2)
+		for j := 0; j < len(ciphertexts[0])/2; j++ {
+			plaintexts[i][j] = '$'
+		}
 	}
 
 	// Locate possible space positions
-	possibleSpaces := []Position{}
+	possibleSpaces = locateSpaces()
 
 }
