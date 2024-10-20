@@ -12,18 +12,55 @@ type Position struct {
 	Letter   int
 }
 
-func hexToBinary(hexString string) (byte, error) {
+func hexToBinary(hexString string) byte {
 	// Parse the hexadecimal string as an unsigned integer (base 16)
-	value, err := strconv.ParseUint(hexString, 16, 8)
-	if err != nil {
-		return 0, fmt.Errorf("invalid hexadecimal string: %w", err)
-	}
+	value, _ := strconv.ParseUint(hexString, 16, 8)
 
-	return byte(value), nil
+	return byte(value)
 }
 
-func locateSpaces(ciphertexts []string, plaintexts *[]string) []Position {
+func locateSpaces(ciphertexts []string, plaintexts *[][]rune) []Position {
 	possibleSpaces := []Position{}
+
+	ciphertextLen := len(ciphertexts[0])
+
+	// Character position in ciphers
+	for charPosition := 0; charPosition < ciphertextLen; charPosition += 2 {
+		// Obtain a letter sentence position
+		var letterSentence int
+		for i := range ciphertexts {
+			firstLetterBinary := hexToBinary(ciphertexts[i][charPosition : charPosition+2])
+			secondLetterBinary := hexToBinary(ciphertexts[i+1][charPosition : charPosition+2])
+
+			result := firstLetterBinary ^ secondLetterBinary
+
+			// Same letter skip
+			if result == 0 {
+				continue
+			} else if byte(1<<6)&result == 0 {
+				letterSentence = i
+				break
+			}
+		}
+
+		// Get empty spaces using that character
+		charBinary := hexToBinary(ciphertexts[letterSentence][charPosition : charPosition+2])
+		for i := range ciphertexts {
+			// Don't check with self
+			if i == letterSentence {
+				continue
+			}
+
+			currBinary := hexToBinary(ciphertexts[i][charPosition : charPosition+2])
+			result := charBinary ^ currBinary
+
+			// Space located
+			if result&byte(1<<6) != 0 {
+				(*plaintexts)[i][charPosition/2] = ' '
+				possibleSpaces = append(possibleSpaces, Position{i, charPosition})
+			}
+		}
+	}
 
 	return possibleSpaces
 }
@@ -63,6 +100,8 @@ func main() {
 	}
 
 	// Locate possible space positions
-	possibleSpaces = locateSpaces()
+	possibleSpaces := locateSpaces(ciphertexts, &plaintexts)
+
+	// Use the spaces located to check for the rest of the letters
 
 }
