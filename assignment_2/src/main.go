@@ -65,6 +65,39 @@ func locateSpaces(ciphertexts []string, plaintexts *[][]rune) []Position {
 	return possibleSpaces
 }
 
+func decodeLetters(possibleSpaces []Position, ciphertexts []string, plaintexts *[][]rune) {
+	// Store what cols are already decoded
+	decodedPositions := make(map[int]bool)
+	spaceBinary := byte(0b00100000)
+
+	// Loop over possibleSpaces and decoded cols based on it
+	for _, space := range possibleSpaces {
+		// Check if position was already decoded
+		if decodedPositions[space.Letter] {
+			continue
+		}
+
+		firstCharBinary := hexToBinary(ciphertexts[space.Sentence][space.Letter : space.Letter+2])
+
+		for i := range ciphertexts {
+			// Don't decode self
+			if i == space.Sentence {
+				continue
+			}
+
+			secondCharBinary := hexToBinary(ciphertexts[i][space.Letter : space.Letter+2])
+			result := firstCharBinary ^ secondCharBinary ^ spaceBinary
+
+			// Update the plaintexts
+			(*plaintexts)[i][space.Letter/2] = rune(result)
+
+		}
+
+		// Column/Letter position doesn't need to be checked again
+		decodedPositions[space.Letter] = true
+	}
+}
+
 func main() {
 	fileName := "ciphertexts.txt"
 
@@ -103,5 +136,16 @@ func main() {
 	possibleSpaces := locateSpaces(ciphertexts, &plaintexts)
 
 	// Use the spaces located to check for the rest of the letters
+	decodeLetters(possibleSpaces, ciphertexts, &plaintexts)
 
+	// Make the final sentences
+	decodedSentences := make([]string, len(ciphertexts))
+	for i := range ciphertexts {
+		decodedSentences[i] = string(plaintexts[i])
+	}
+
+	// Print decoded sentences
+	for i := range decodedSentences {
+		fmt.Println(decodedSentences[i])
+	}
 }
