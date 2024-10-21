@@ -1,9 +1,7 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"os"
 	"strconv"
 )
 
@@ -99,28 +97,16 @@ func decodeLetters(possibleSpaces []Position, ciphertexts []string, plaintexts *
 }
 
 func main() {
-	fileName := "ciphertexts.txt"
-
-	// Open the file and check for errors
-	file, err := os.Open(fileName)
-	if err != nil {
-		fmt.Println("Error opening file", err)
-		return
-	}
-	defer file.Close()
-
-	ciphertexts := []string{} // Holds all out ciphertexts
-
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		cipher := scanner.Text()
-		ciphertexts = append(ciphertexts, cipher)
-	}
-
-	// Check for any errors during scanning
-	if err := scanner.Err(); err != nil {
-		fmt.Println("Error reading from file:", err)
-		return
+	// Holds all out ciphertexts
+	ciphertexts := []string{
+		"F9B4228898864FCB32D83F3DFD7589F109E33988FA8C7A9E9170FB923065F52DD648AA2B8359E1D122122738A8B9998BE278B2BD7CF3313C7609",
+		"F5BF229F8F9B1C8832C0212DFD7F92EA18FF29C7E6C968848D6EFAC16074F129D640AB67CE59E3DC6109212AB4EB959FFD34F3B269EB292C7409",
+		"FDAF668499C801C734813F3BF3718FF91AEA2C88FC862B999D6EE7C16369F83ADF57FF28CD18FCCC6F0D2B2BB5A295DEF436B0A164EF3C267014",
+		"FDFB35858B8403882EC4392CE03289F50CF82588FC816ECB8B63F3843076F52CC059B035C718E0DB220D3B33B3A28692F478B2B07EF03D216B09",
+		"E4BE239FCA9A0ADE29C43869FD74DBE31CE835DAE19D72CB9567FD897168FD2CDE5DFF35C65CFAD667136E29B2A7989BE339B1BA71F63C267A09",
+		"F8BE279F848101CF60C9203EB26694B00EF929DCEDC9788E9B77EC843075FB39C759BE35C618E6C622016E31A2A8938DE239A1AA3DEC23267316",
+		"E7BE2598988D4FC325D86F2CEA7193F117EC2588E19A2B859D67FA847426F230C10EAC3ECE55EAC170092D7FACAE8FDEF436B0A164EF3C267014",
+		"E7BE259898811BD160C03B69E67A9EB01CF330CDE69A6ECB9764BE946367F636DF47AB3E835BE0C06E046E3BA6A69799F478A0B67EEA3A266B03",
 	}
 
 	// Make empty plaintexts to hold possible information while decrypting the ciphertexts
@@ -145,7 +131,41 @@ func main() {
 	}
 
 	// Print decoded sentences
+	fmt.Println("Decoded texts:")
 	for i := range decodedSentences {
 		fmt.Println(decodedSentences[i])
+	}
+
+	decryptedTexts := make([][]rune, len(ciphertexts))
+	for i := range decryptedTexts {
+		decryptedTexts[i] = make([]rune, len(ciphertexts[0])/2)
+		for j := 0; j < len(ciphertexts[0])/2; j++ {
+			decryptedTexts[i][j] = '$'
+		}
+	}
+
+	decryptedText := "Secure key exchange is needed for symmetric key encryption"
+	decryptedCipher := "E7BE2598988D4FC325D86F2CEA7193F117EC2588E19A2B859D67FA847426F230C10EAC3ECE55EAC170092D7FACAE8FDEF436B0A164EF3C267014"
+
+	for cipherIndex := range ciphertexts {
+		for charIndex := 0; charIndex < len(ciphertexts[0]); charIndex += 2 {
+			cipherChar := hexToBinary(ciphertexts[cipherIndex][charIndex : charIndex+2])
+			knownCharCipher := hexToBinary(decryptedCipher[charIndex : charIndex+2])
+			knownCharBits := byte(decryptedText[charIndex/2])
+
+			decryptedChar := cipherChar ^ knownCharCipher ^ knownCharBits
+			decryptedTexts[cipherIndex][charIndex/2] = rune(decryptedChar)
+		}
+	}
+
+	decryptedSentences := make([]string, len(ciphertexts))
+	for i := range ciphertexts {
+		decryptedSentences[i] = string(decryptedTexts[i])
+	}
+
+	// Print decoded sentences
+	println("\nDecrypted texts after guessing 7th sentence:")
+	for i := range decryptedSentences {
+		fmt.Println(decryptedSentences[i])
 	}
 }
