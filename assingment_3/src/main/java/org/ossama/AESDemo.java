@@ -1,3 +1,5 @@
+package org.ossama;
+
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Arrays;
